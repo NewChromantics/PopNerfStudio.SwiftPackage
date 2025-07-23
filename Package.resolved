@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "popcommon.swiftpackage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/NewChromantics/PopCommon.SwiftPackage",
+      "state" : {
+        "branch" : "main",
+        "revision" : "77d3430ce6c085880dfe81aadebc1d3f5eb8af31"
+      }
+    },
+    {
+      "identity" : "popply.swiftpackage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/NewChromantics/PopPly.SwiftPackage",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4695a114ba922bb82fa3d944a9819060cf4ca30c"
+      }
+    }
+  ],
+  "version" : 2
+}

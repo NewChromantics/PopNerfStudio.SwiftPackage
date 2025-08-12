@@ -17,19 +17,50 @@ public struct NerfDataError : LocalizedError
 }
 
 
-struct CameraIntrinsics : Decodable
+public struct CameraIntrinsics : Decodable
 {
-	var w : Float
-	var h : Float
-	var fx : Float
-	var fy : Float
-	var cx : Float
-	var cy : Float
-	var k1 : Float
-	var k2 : Float
-	var k3 : Float
-	var p1 : Float
-	var p2 : Float
+	public var w : Float
+	public var h : Float
+	public var fx : Float
+	public var fy : Float
+	public var cx : Float
+	public var cy : Float
+	public var k1 : Float
+	public var k2 : Float
+	public var k3 : Float
+	public var p1 : Float
+	public var p2 : Float
+	
+	
+	public init(imageWidth:Int,imageHeight:Int) 
+	{
+		self.w = Float(imageWidth)
+		self.h = Float(imageHeight)
+		self.fx = w
+		self.fy = h
+		self.cx = w/2
+		self.cy = h/2
+		self.k1 = 0
+		self.k2 = 0
+		self.k3 = 0
+		self.p1 = 0
+		self.p2 = 0
+	}
+	
+	public init(w: Float, h: Float, fx: Float, fy: Float, cx: Float, cy: Float, k1: Float, k2: Float, k3: Float, p1: Float, p2: Float) 
+	{
+		self.w = w
+		self.h = h
+		self.fx = fx
+		self.fy = fy
+		self.cx = cx
+		self.cy = cy
+		self.k1 = k1
+		self.k2 = k2
+		self.k3 = k3
+		self.p1 = p1
+		self.p2 = p2
+	}
 }
 
 extension simd_float4
@@ -40,11 +71,11 @@ extension simd_float4
 	}
 }
 
-public struct NerfStudioFrame : Decodable
+public struct NerfStudioFrame : Decodable, Encodable
 {
-	var file_path : String
-	var transform_matrix : [[Float]]
-	var localToWorld : simd_float4x4
+	public var file_path : String
+	public var transform_matrix : [[Float]]
+	public var localToWorld : simd_float4x4
 	{
 		get
 		{
@@ -67,25 +98,43 @@ public struct NerfStudioFrame : Decodable
 	}
 	
 	//	optional intrinsics
-	var w : Float?
-	var h : Float?
+	public var w : Float?
+	public var h : Float?
 	var fl_x : Float?
 	var fl_y : Float?
-	var fx : Float?	{	fl_x	}
-	var fy : Float?	{	fl_y	}
-	var cx : Float?
-	var cy : Float?
-	var k1 : Float?
-	var k2 : Float?
-	var k3 : Float?
-	var p1 : Float?
-	var p2 : Float?
+	public var fx : Float?	{	fl_x	}
+	public var fy : Float?	{	fl_y	}
+	public var cx : Float?
+	public var cy : Float?
+	public var k1 : Float?
+	public var k2 : Float?
+	public var k3 : Float?
+	public var p1 : Float?
+	public var p2 : Float?
+	
+	public init(file_path: String, localToWorld: simd_float4x4, intrinsics:CameraIntrinsics)
+	{
+		self.file_path = file_path
+		self.transform_matrix = []
+		self.localToWorld = localToWorld
+		self.w = intrinsics.w
+		self.h = intrinsics.h
+		self.fl_x = intrinsics.fx
+		self.fl_y = intrinsics.fy
+		self.cx = intrinsics.cx
+		self.cy = intrinsics.cy
+		self.k1 = intrinsics.k1
+		self.k2 = intrinsics.k2
+		self.k3 = intrinsics.k3
+		self.p1 = intrinsics.p1
+		self.p2 = intrinsics.p2
+	}
 }
 
-public struct NerfStudioTransforms : Decodable
+public struct NerfStudioTransforms : Decodable, Encodable
 {
-	var camera_model : String
-	var frames : [NerfStudioFrame]
+	public var camera_model : String
+	public var frames : [NerfStudioFrame]
 	var ply_file_path : String?
 	
 	//	optional global values for intrinsics
@@ -103,7 +152,14 @@ public struct NerfStudioTransforms : Decodable
 	var p1 : Float?
 	var p2 : Float?
 	
-	func GetCameraIntrinsics(frame:NerfStudioFrame) throws -> CameraIntrinsics
+	public init(camera_model: String, frames: [NerfStudioFrame], ply_file_path: String?)
+	{
+		self.camera_model = camera_model
+		self.frames = frames
+		self.ply_file_path = ply_file_path
+	}
+	
+	public func GetCameraIntrinsics(frame:NerfStudioFrame) throws -> CameraIntrinsics
 	{
 		func getValue(_ v:Float?,_ context:String) throws -> Float
 		{
@@ -198,9 +254,9 @@ public class PlySink : PLYReaderDelegate
 public struct NerfStudioData
 {
 	public var transforms : NerfStudioTransforms
-	var pointsXyz : [Float]
-	var pointsRgb : [Float]
-	var pointCount : Int		{	pointsXyz.count / 3	}
+	public var pointsXyz : [Float]
+	public var pointsRgb : [Float]
+	public var pointCount : Int		{	pointsXyz.count / 3	}
 	
 	public init(projectRoot:String,applyTransform:simd_float4x4=simd_float4x4.identity) throws
 	{

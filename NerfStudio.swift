@@ -61,6 +61,24 @@ public struct CameraIntrinsics : Decodable
 		self.p1 = p1
 		self.p2 = p2
 	}
+	
+	public var pixelToLocalTransform : simd_float4x4
+	{
+		return localToPixelTransform.inverse
+	}
+	
+	public var localToPixelTransform : simd_float4x4
+	{
+		let zmin = Float(0)
+		let zscale = Float(1)
+		let localToView4x4 = simd_float4x4(columns:(
+			simd_float4(fx,  0, 0,   0),
+			simd_float4( 0, fy, 0,   0),
+			simd_float4(cx, cy, zscale, 0),
+			simd_float4( 0,  0, zmin, 1)
+		))
+		return localToView4x4
+	}
 }
 
 extension simd_float4
